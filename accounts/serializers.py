@@ -31,28 +31,39 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
 
 
 
-# class UserLoginSerializer(serializers.ModelSerializer):
-#     username = serializers.CharField(max_length=200)
-#     class Meta:
-#         model = User
-#         fields = ['username', 'password']
+class UserLoginSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=200)
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
+class ProfileInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
         
-        
-# class UserProfileSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['id', 'username', 'name', 'email', 'phone']
-        
-        
-# class LogoutSerializer(serializers.ModelSerializer):
-#     refresh = serializers.CharField()
-    
-#     def validate(self, attrs):
-#         self.token = attrs['refresh']
-#         return attrs
-    
-#     def save(self, **kwargs):
-#         try:
-#             RefreshToken(self.token).blacklist()
-#         except TokenError():
-#             self.fail('bad token')
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email']
+
+
+class ProfileEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['bio', 'cover', ]
+
+
+class DeleteAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
