@@ -14,7 +14,8 @@ from posts.models import (Posts, Gallery, LikePost, Comment, LikeComment,
                           ReplyComment, LikeReply, BookMarck)
 from accounts.renders import UserRender
 from posts.serializers import (PostsSerializer, GallerySerializer, CreatePostSerializer,
-                               CreateCommentSerializer, ReplyCommentSerializer, BookMarckSerializer)
+                               CreateCommentSerializer, ReplyCommentSerializer, BookMarckSerializer,
+                               CommentSerializer, CreateReplyCommentSerializer)
 
 
 class ShowUserPost(APIView):
@@ -66,9 +67,13 @@ class ShowSinglePost(APIView):
             gallery = Gallery.objects.filter(post=post).first()
             serializer_gallery = GallerySerializer(gallery)
             
+            like = LikePost.objects.filter(post=post).count()
+            comment = Comment.objects.filter(post=post).count()
             content = {
             'post': serializer_post.data,
             'gallery': serializer_gallery.data,
+            'like': like,
+            'comment': comment,
             }
             
             return Response(content, status=status.HTTP_200_OK)
@@ -153,13 +158,28 @@ class LikeCommentView(APIView):
         return Response({'msg': 'liked...'}, status=status.HTTP_201_CREATED)
 
 
+class ShowComment(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk, format=None):
+        post = Post.objects.get(id=pk)
+        comment = Comment.objects.filter(post=post)
+        serializer = CommentSerializer(comment, many=True)
+        like = LikeComment.objects.filter(comment=comment).count()
+        content = {
+            'comment': serializer.data,
+            'like': like,
+        }
+        return Response(content, status=status.HTTP_200_OK)
+
+
 class ReplyCommentView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     def post(self, request, pk, format=None):
         user = User.objects.get(username=str(request.user))
         comment = Comment.objects.get(id=pk)
-        serializer = ReplyCommentSerializer(data=request.data)
+        serializer = CreateReplyCommentSerializer(data=request.data)
         ReplyComment.objects.create(user=user, comment=comment, content=request.data.get('content'))
         return Response({'msg': 'send reply comment...'}, status=status.HTTP_201_CREATED)
 
@@ -179,6 +199,22 @@ class LikeReplyView(APIView):
             like.like = True
             like.save()
         return Response({'msg': 'liked...'}, status=status.HTTP_201_CREATED)
+
+
+class ShowReplyComment(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk, format=None):
+        post = Post.objects.get(id=pk)
+        reply = ReplyComment.objects.filter(post=post)
+        serializer = ReplyCommentSerializer(reply, many=True)
+        like = LikeReply.objects.filter(reply=reply).count()
+        content = {
+            'reply': serializer.data,
+            'like': like,
+        }
+        return Response(content, status=status.HTTP_200_OK)
+
 
 
 class BookMarckView(APIView):

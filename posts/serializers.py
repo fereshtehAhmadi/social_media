@@ -32,10 +32,22 @@ class CreateCommentSerializer(serializers.ModelSerializer):
         fields = ['content', ]
 
 
-class ReplyCommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+
+class CreateReplyCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReplyComment
         fields = ['content', ]
+
+
+class ReplyCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReplyComment
+        fields = '__all__'
 
 
 class BookMarckSerializer(serializers.ModelSerializer):
