@@ -135,15 +135,19 @@ class AcceptRequest(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, pk, status, format=None):
         sender = User.objects.get(id=pk)
-        user = Profile.objects.get(user__username=str(request.user))
+        sender_profile = Profile.objects.get(user=sender)
+        user = User.objects.get(username=str(request.user))
+        user_profile = Profile.objects.get(user=user)
         if status == 'True':
-            user.follower.add(sender)
-            user.request.remove(sender)
-            user.save()
+            user_profile.follower.add(sender)
+            user_profile.request.remove(sender)
+            user_profile.save()
+            sender_profile.following.add(user)
+            sender_profile.save()
             return Response({'msg': 'you accept the request...'})
         elif status == 'False':
-            user.request.remove(sender)
-            user.save()
+            user_profile.request.remove(sender)
+            user_profile.save()
             return Response({'msg': 'you delete the request...'})
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -159,6 +163,32 @@ class RequestList(APIView):
             'requests': serializer.data.get('request')
         }
         return Response(content, status=status.HTTP_200_OK)
+
+
+class Unfollow(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def put(self, request, pk, format=None):
+        me = User.objects.get(username=str(requset.user))
+        me_profile = Profile.objects.get(user__username=me.username)
+        user = User.objects.get(id=pk)
+        profile = Profile.objects.get(user__username=user.username)
+        profile.following.remove(me)
+        me_profile.follower.remove(profile)
+        return Response({'msg': 'Unfollow...'}, status=status.HTTP_200_OK)
+
+
+class Block(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def put(self, request, pk, format=None):
+        me = User.objects.get(username=str(request.user))
+        me_profile = Profile.objects.get(user=me)
+        user = User.objects.get(id=pk)
+        profile = Profile.objects.get(user__username=user.username)
+        profile.follower.remove(me)
+        me_profile.following.remove(user)
+        return Response({'msg': 'Blocked...'}, status=status.HTTP_200_OK)
 
 
 class FollowerList(APIView):
