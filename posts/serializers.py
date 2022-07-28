@@ -15,17 +15,36 @@ class GallerySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CreateGallerySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gallery
+        fields = ['id', 'image', ]
+
+
 class CreatePostSerializer(serializers.ModelSerializer):
+    postimage_set = CreateGallerySerializer(many=True)
     class Meta:
         model = Posts
         fields = '__all__'
     
-    def create(self, validated_data):
-        post = Posts.objects.create(**validated_data)
+    def create(self, validated_date):
+        image = self.context['request'].FILES.getlist('image')
+
+        for i in list(image):
+            m2 = Gallery(post=post, image= i)
+            m2.save()
+
+
+class UpdatePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Posts
+        feilds = ['content', ]
+
+    # def create(self, validated_data):
+    #     post = Posts.objects.create(**validated_data)
+    #     print(**validated_data)
         
-        gallery = Gallery.objects.create(post = post, **validated_data, )
-
-
+    #     gallery = Gallery.objects.create(post = post, **validated_data, )
 class CreateCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment

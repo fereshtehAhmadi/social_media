@@ -92,9 +92,13 @@ class UserEditView(APIView):
         user_info = UserInfoSerializer(query)
         profile = Profile.objects.get(user=query)
         profile_info = ProfileInfoSerializer(profile)
+        follower = profile.follower.all().count()
+        following = profile.following.all().count()
         content = {
             'user': user_info.data,
             'profile' : profile_info.data,
+            'follower': follower,
+            'following': following,
         }
         return Response(content, status.HTTP_200_OK)
 
@@ -233,9 +237,13 @@ class UserInfo(APIView):
         user_serializer = UserSerializer(user)
         profile = Profile.objects.get(user__username=user)
         profile_serializer = ProfileSerializer(profile)
+        follower = profile.follower.all().count()
+        following = profile.following.all().count()
         
         content = {
             'user': user_serializer.data,
             'profile': profile_serializer.data,
+            'follower': follower,
+            'following': following,
         }
         return Response(content, status=status.HTTP_200_OK)

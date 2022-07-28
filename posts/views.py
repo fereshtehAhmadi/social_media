@@ -15,7 +15,7 @@ from posts.models import (Posts, Gallery, LikePost, Comment, LikeComment,
 from accounts.renders import UserRender
 from posts.serializers import (PostsSerializer, GallerySerializer, CreatePostSerializer,
                                CreateCommentSerializer, ReplyCommentSerializer, BookMarckSerializer,
-                               CommentSerializer, CreateReplyCommentSerializer)
+                               CommentSerializer, CreateReplyCommentSerializer, UpdatePostSerializer,)
 
 
 class ShowUserPost(APIView):
@@ -64,8 +64,8 @@ class ShowSinglePost(APIView):
             post.views = int(post.views) + 1
             post.save()
             serializer_post = PostsSerializer(post)
-            gallery = Gallery.objects.filter(post=post).first()
-            serializer_gallery = GallerySerializer(gallery)
+            gallery = Gallery.objects.filter(post=post)
+            serializer_gallery = GallerySerializer(gallery, many=True)
             
             like = LikePost.objects.filter(post=post).count()
             comment = Comment.objects.filter(post=post).count()
@@ -81,36 +81,42 @@ class ShowSinglePost(APIView):
             return Response({'msg': 'you cant see this post...'}, status=status.HTTP_400_BAD_REQUEST)        
 
 
-# class CreatePost(APIView):
-#     authentication_classes = [SessionAuthentication, BasicAuthentication]
-#     permission_classes = [IsAuthenticated]
-#     def post(self, request, format=None):
-#         post_serializer = PostsSerializer(data=request.data)
-#         if post_serializer.is_valid(raise_exception=True):
-#             post = Post.objects.create(post_serializer.data)
-#             gallery_serializer = GallerySerializer(data=request.data, many=True)
-#             if gallery_serializer.is_valid(raise_exception=True):
-#                 gallery = Gallery.objects.create(post=post, image= request.data.get('image'))
-                
-#                 content = {
-#                     'post': post,
-#                     'gallery': gallery,
-#                 }
-#                 return Response(content, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response({'msg': ':(((((((((((('}, status=status.HTTP_400_BAD_REQUEST)
-
-
 class CreatePost(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    def post(self, request, format=None):
-        serializer = CreatePostSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = serializer.save()
-            return Response({'msg':'affarin...'}, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, fromat=None):
+        serializer = CreatePostSerializer(data=request.data, context={'request':request,})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeletePost(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def delete(self, request, pk, format=None):
+        user = User.objects.get(username=str(request.user))
+        post = Posts.objects.get(id=pk)
+        if post.user == user:
+            post.delete()
+            post.save()
+            return Response({'msg': 'delete successfully...'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'msg': 'not found...'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class UpdatePost(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def put(self, request, pk, format=None):
+        user = User.objects.get(username=str(request.user))
+        post = Posts.objects.get(id=pk)
+        if post.user == user:
+            serializer = UpdatePostSerializer(data=request.data)
+            post.content = request.data.get('content')
+            post.save()
+            return Response({'msg': 'delete successfully...'}, status=status.HTTP_201_CREATED)
+        return Response({'msg': 'not found...'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class LikePostView(APIView):
@@ -171,6 +177,35 @@ class ShowComment(APIView):
             'like': like,
         }
         return Response(content, status=status.HTTP_200_OK)
+
+
+class DeleteComment(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def delete(self, request, pk, format=None):
+        user = User.objects.get(username=str(request.user))
+        comment = Comment.objects.get(id=pk)
+        post = Posts.objects.get(id=comment.post)
+        if comment.user == user or post.user == user:
+            comment.delete()
+            comment.save()
+            return Response({'msg': 'delete comment successfully...'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'msg': ':/ ?!'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+class DeleteReplyComment(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def delete(self, request, pk, format=None):
+        user = User.objects.get(username=str(request.user))
+        comment = ReplyComment.objects.get(id=pk)
+        post = Posts.objects.get(id=comment.post)
+        if comment.user == user or post.user == user:
+            comment.delete()
+            comment.save()
+            return Response({'msg': 'delete comment successfully...'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'msg': ':/ ?!'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class ReplyCommentView(APIView):
