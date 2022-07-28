@@ -1,8 +1,9 @@
 from django.contrib import admin
-from posts.models import Posts, LikePost, Comment, LikeComment, ReplyComment, LikeReply
-
+from posts.models import Posts, Gallery, LikePost, Comment, LikeComment, ReplyComment, LikeReply
+    
 
 admin.site.register(Posts)
+admin.site.register(Gallery)
 admin.site.register(LikePost)
 admin.site.register(Comment)
 admin.site.register(LikeComment)

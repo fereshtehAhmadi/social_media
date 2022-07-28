@@ -4,14 +4,14 @@ from accounts.models import User
 
 class Posts(models.Model):
     content = models.TextField()
-    views = models.IntegerField()
+    views = models.IntegerField(default=0)
     create = models.DateTimeField(auto_now_add=True)
     update = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     
     def __str__(self):
-        return self.user.username
-    
+        return f'{self.user.username} has {self.id} post.'
+
 
 class Gallery(models.Model):
     image = models.ImageField(upload_to='posts/')
