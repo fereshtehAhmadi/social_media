@@ -12,8 +12,8 @@ from django.db.models import Count
 from accounts.models import Profile
 from accounts.renders import UserRender
 from accounts.serializers import (UserRegisterationSerializer, UserLoginSerializer,
-    DeleteAccountSerializer,UserEditSerializer,ProfileEditSerializer, UserInfoSerializer, 
-    ProfileInfoSerializer)
+    DeleteAccountSerializer,UserSerializer,ProfileSerializer, UserInfoSerializer, 
+    ProfileInfoSerializer, UserChangePasswordSerializer)
 
 
 def get_tokens_for_user(user):
@@ -54,14 +54,27 @@ class UserLoginView(APIView):
                         status=status.HTTP_404_NOT_FOUND)
 
 
+class UserChangePasswordView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, format=None):
+        serializer = UserChangePasswordSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = User.objects.get(username=str(request.user))
+            user.set_password(request.data.get('password'))
+            user.save()
+            return Response({'msg': 'your password is change...'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class UserEditView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     def put(self, request, format=None):
-        user = UserEditSerializer(data=request.data)
+        user = UserSerializer(data=request.data)
         if user.is_valid(raise_exception=True):
             user.save()
-            profile = ProfileEditSerializer(data=request.data)
+            profile = ProfileSerializer(data=request.data)
             if profile.is_valid(raise_exception=True):
                 profile.save()
                 content = {
@@ -104,3 +117,95 @@ class UserDeleteAccountView(APIView):
             user.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class SendRequest(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, pk, format=None):
+        sender = User.objects.get(username=str(request.user))
+        receiver = User.objects.get(id=pk)
+        receiver_profile = Profile.objects.get(user__username=receiver)
+        receiver_profile.request.add(sender)
+        receiver_profile.save()
+        return Response({'msg': 'your request has been sent...'}, status=status.HTTP_200_OK)
+
+
+class AcceptRequest(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, pk, status, format=None):
+        sender = User.objects.get(id=pk)
+        user = Profile.objects.get(user__username=str(request.user))
+        if status == 'True':
+            user.follower.add(sender)
+            user.request.remove(sender)
+            user.save()
+            return Response({'msg': 'you accept the request...'})
+        elif status == 'False':
+            user.request.remove(sender)
+            user.save()
+            return Response({'msg': 'you delete the request...'})
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class RequestList(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, format=None):
+        user = Profile.objects.get(user__username=str(request.user))
+        serializer = ProfileSerializer(user)
+        
+        content = {
+            'requests': serializer.data.get('request')
+        }
+        return Response(content, status=status.HTTP_200_OK)
+
+
+class FollowerList(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk=None, format=None):
+        if pk is None:
+            user = Profile.objects.get(user__username=str(request.user))
+            serializer = ProfileSerializer(user)
+        else:
+            user = Profile.objects.get(id=pk)
+            serializer = ProfileSerializer(user)
+        
+        content = {
+            'follower': serializer.data.get('follower')
+        }
+        return Response(content, status=status.HTTP_200_OK)
+
+
+class FollowingList(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk=None, format=None):
+        if pk is None:
+            user = Profile.objects.get(user__username=str(request.user))
+            serializer = ProfileSerializer(user)
+        else:
+            user = Profile.objects.get(id=pk)
+            serializer = ProfileSerializer(user)
+        
+        content = {
+            'following': serializer.data.get('following')
+        }
+        return Response(content, status=status.HTTP_200_OK)
+
+
+class UserInfo(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk, format=None):
+        user = User.objects.get(id=pk)
+        user_serializer = UserSerializer(user)
+        profile = Profile.objects.get(user__username=user)
+        profile_serializer = ProfileSerializer(profile)
+        
+        content = {
+            'user': user_serializer.data,
+            'profile': profile_serializer.data,
+        }
+        return Response(content, status=status.HTTP_200_OK)

@@ -50,16 +50,16 @@ class ProfileInfoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
         
-class UserEditSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email']
+        fields = '__all__'
 
 
-class ProfileEditSerializer(serializers.ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['bio', 'cover', ]
+        fields = '__all__'
 
 
 class DeleteAccountSerializer(serializers.ModelSerializer):
@@ -67,3 +67,24 @@ class DeleteAccountSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+
+class UserChangePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=255, 
+                                     style = {'input_type': 'password'}, write_only=True)
+    password2 = serializers.CharField(max_length=255, 
+                                     style = {'input_type': 'password'}, write_only=True)
+    class Meta:
+        fields = ['password', 'password2']
+    
+    def validate(self, attrs):
+        password = attrs.get('password')
+        password2 = attrs.get('password2')
+        if password != password2:
+            raise Serializer.VlidationError("password and confirm password doesn't match")
+        return attrs
+
+
+class RequestListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
