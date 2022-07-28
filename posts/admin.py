@@ -1,5 +1,6 @@
 from django.contrib import admin
-from posts.models import Posts, Gallery, LikePost, Comment, LikeComment, ReplyComment, LikeReply
+from posts.models import (Posts, Gallery, LikePost, Comment, LikeComment,
+                          ReplyComment, LikeReply, BookMarck)
     
 
 admin.site.register(Posts)
@@ -9,3 +10,4 @@ admin.site.register(Comment)
 admin.site.register(LikeComment)
 admin.site.register(ReplyComment)
 admin.site.register(LikeReply)
+admin.site.register(BookMarck)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from posts.models import Posts, Gallery, LikePost, Comment, LikeComment, ReplyComment, LikeReply
+from posts.models import (Posts, Gallery, LikePost, Comment, LikeComment,
+                          ReplyComment, LikeReply, BookMarck)
 
 
 class PostsSerializer(serializers.ModelSerializer):
@@ -35,3 +36,9 @@ class ReplyCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReplyComment
         fields = ['content', ]
+
+
+class BookMarckSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookMarck
+        fields = '__all__'

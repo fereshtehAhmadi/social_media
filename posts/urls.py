@@ -11,4 +11,7 @@ urlpatterns = [
     path('like_comment/<int:pk>', views.LikeCommentView.as_view(), name='like_comment'),
     path('reply_comment/<int:pk>', views.ReplyCommentView.as_view(), name='reply_comment'),
     path('like_reply/<int:pk>', views.LikeReplyView.as_view(), name='like_reply'),
+    
+    path('bookmarck/<int:pk>', views.BookMarckView.as_view(), name='bookmarck'),
+    path('show_bookmarck/<int:pk>', views.AllBookMarckView.as_view(), name='show_bookmarck'),
 ]

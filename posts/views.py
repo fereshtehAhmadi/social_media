@@ -10,10 +10,11 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 
 from accounts.models import Profile
-from posts.models import Posts, Gallery, LikePost, Comment, LikeComment, ReplyComment, LikeReply
+from posts.models import (Posts, Gallery, LikePost, Comment, LikeComment,
+                          ReplyComment, LikeReply, BookMarck)
 from accounts.renders import UserRender
 from posts.serializers import (PostsSerializer, GallerySerializer, CreatePostSerializer,
-                               CreateCommentSerializer, ReplyCommentSerializer)
+                               CreateCommentSerializer, ReplyCommentSerializer, BookMarckSerializer)
 
 
 class ShowUserPost(APIView):
@@ -178,4 +179,38 @@ class LikeReplyView(APIView):
             like.like = True
             like.save()
         return Response({'msg': 'liked...'}, status=status.HTTP_201_CREATED)
-    
+
+
+class BookMarckView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, pk, format=None):
+        post = Posts.objects.get(id=pk)
+        user = User.objects.get(username=str(request.user))
+        validation = BookMarck.objects.filter(user=user).exists()
+        if not validation:
+            bookmarck = BookMarck.objects.create(user=user)
+            bookmarck.post.add(post)
+            bookmarck.save()
+            return Response({'msg': 'add in bookmarck...'}, status=status.HTTP_201_CREATED)
+        else:
+            valid = BookMarck.objects.filter(user=user, post=post).exists()
+            if valid:
+                bookmarck = BookMarck.objects.create(user=user)
+                bookmarck.post.remove(post)
+                bookmarck.save()
+                return Response({'msg': 'delete...'}, status=status.HTTP_200_OK)
+            else:
+                obj = BookMarck.objects.get(user=user)
+                obj.post.add(post)
+                obj.save()
+                return Response({'msg': 'add in bookmarck...'}, status=status.HTTP_201_CREATED)
+
+
+class AllBookMarckView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, format=None):
+        query = BookMarck.objects.filter(user__username=str(request.user))
+        serializer = BookMarckSerializer(query, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
