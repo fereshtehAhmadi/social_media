@@ -30,7 +30,9 @@ class ShowOtherPosts(APIView):
     def get(self, request, pk, format=None):
         user = Profile.objects.get(id=pk)
         requester = User.objects.get(username=str(request.user))
-        if requester.id in user.follower:
+        validation = Profile.objects.filter(id=pk, follower=requester).exists()
+        # if requester.id in user.follower:
+        if validation:
             post = Posts.objects.get(user__username=user)
             serializer = PostsSerializer(post)
             return Response(serializer.data, status=status.HTTP_200_OK)
