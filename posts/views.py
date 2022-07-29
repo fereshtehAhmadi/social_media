@@ -22,8 +22,16 @@ class ShowUserPost(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
-        gallery = Gallery.objects.filter(post__user__username=str(request.user))
+        post = Posts.objects.filter(user__username=str(request.user))
+        
+        for p in post:
+            g = Gallery.objects.filter(post=p).first()
+            g.selected = True
+            g.save()
+        
+        gallery = Gallery.objects.filter(post__user__username=str(request.user), selected=True)  
         serializer_gallery = GallerySerializer(gallery, many=True)
+        
         content = {
             'gallery': serializer_gallery.data,
         }
@@ -38,13 +46,16 @@ class ShowOtherPosts(APIView):
         requester = User.objects.get(username=str(request.user))
         validation = Profile.objects.filter(id=pk, follower=requester).exists()
         if validation:
-            post = Posts.objects.get(user__username=user)
-            serializer_post = PostsSerializer(post)
-            gallery = Gallery.objects.filter(post=post).first()
-            serializer_gallery = GallerySerializer(gallery)
+            post = Posts.objects.filter(user__username=user)
+            for p in post:
+                g = Gallery.objects.filter(post=p).first()
+                g.selected = True
+                g.save()
+            
+            gallery = Gallery.objects.filter(post__user__username=user, selected=True)
+            serializer_gallery = GallerySerializer(gallery, many=True)
             
             content = {
-            'post': serializer_post.data,
             'gallery': serializer_gallery.data,
             }   
             return Response(content, status=status.HTTP_200_OK)
@@ -270,7 +281,7 @@ class BookMarckView(APIView):
                 bookmarck = BookMarck.objects.create(user=user)
                 bookmarck.post.remove(post)
                 bookmarck.save()
-                return Response({'msg': 'delete...'}, status=status.HTTP_200_OK)
+                return Response({'msg': 'remove this post from bookmarck...'}, status=status.HTTP_200_OK)
             else:
                 obj = BookMarck.objects.get(user=user)
                 obj.post.add(post)

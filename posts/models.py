@@ -10,12 +10,16 @@ class Posts(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f'{self.user.username} has {self.id} post.'
+        return f'{self.id}'
 
 
 class Gallery(models.Model):
     image = models.ImageField(upload_to='posts/')
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    selected = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f'{self.id}'
 
 
 class LikePost(models.Model):
