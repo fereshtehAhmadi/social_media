@@ -40,11 +40,7 @@ class UpdatePostSerializer(serializers.ModelSerializer):
         model = Posts
         feilds = ['content', ]
 
-    # def create(self, validated_data):
-    #     post = Posts.objects.create(**validated_data)
-    #     print(**validated_data)
-        
-    #     gallery = Gallery.objects.create(post = post, **validated_data, )
+
 class CreateCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
@@ -72,4 +68,22 @@ class ReplyCommentSerializer(serializers.ModelSerializer):
 class BookMarckSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookMarck
+        fields = '__all__'
+
+
+class LikePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LikePost
+        fields = '__all__'
+
+
+class LikeCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LikeComment
+        fields = '__all__'
+
+
+class LikeReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LikeReply
         fields = '__all__'

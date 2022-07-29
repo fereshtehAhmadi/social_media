@@ -26,6 +26,9 @@ class LikePost(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
     like = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.user.username
 
 
 class Comment(models.Model):
@@ -33,12 +36,18 @@ class Comment(models.Model):
     create = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.user.username
 
 
 class LikeComment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     like = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.user.username
 
 
 class ReplyComment(models.Model):
@@ -46,12 +55,18 @@ class ReplyComment(models.Model):
     create = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.user.username
 
 
 class LikeReply(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reply = models.ForeignKey(ReplyComment, on_delete=models.CASCADE)
     like = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.user.username
 
 
 class BookMarck(models.Model):
@@ -60,4 +75,4 @@ class BookMarck(models.Model):
 
     
     def __str__(self):
-        return self.user.user.username
+        return self.user.username

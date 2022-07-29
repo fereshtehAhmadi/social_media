@@ -15,8 +15,11 @@ urlpatterns = [
     path('delete_reply_comment/<int:pk>', views.DeleteReplyComment.as_view(), name='delete_reply_comment'),
 
     path('like_post/<int:pk>', views.LikePostView.as_view(), name='like_post'),
+    path('show_liker_post/<int:pk>', views.ShowLikePostList.as_view(), name='show_liker_post'),
     path('like_comment/<int:pk>', views.LikeCommentView.as_view(), name='like_comment'),
+    path('show_liker_comment/<int:pk>', views.ShowLikeCommentList.as_view(), name='show_liker_comment'),
     path('like_reply/<int:pk>', views.LikeReplyView.as_view(), name='like_reply'),
+    path('show_liker_reply/<int:pk>', views.ShowLikeReplyList.as_view(), name='show_liker_reply'),
     
     path('show_comments/<int:pk>', views.ShowComment.as_view(), name='show_comments'),
     path('show_reply/<int:pk>', views.ShowReplyComment.as_view(), name='show_reply'),
