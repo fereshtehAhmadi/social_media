@@ -5,15 +5,16 @@ from rest_framework.views import APIView
 from rest_framework import status, generics, views, permissions
 from rest_framework.response import Response
 
+from random import randint
+
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.contrib.auth.models import User
 from django.db.models import Count
 
-from accounts.models import Profile
+from accounts.models import Profile, User, Validation
 from accounts.renders import UserRender
 from accounts.serializers import (UserRegisterationSerializer, UserLoginSerializer,
     DeleteAccountSerializer,UserSerializer,ProfileSerializer, UserInfoSerializer, 
-    ProfileInfoSerializer, UserChangePasswordSerializer)
+    ProfileInfoSerializer, UserChangePasswordSerializer, PhoneSerializer, CodeSerializer)
 
 
 def get_tokens_for_user(user):
@@ -25,16 +26,72 @@ def get_tokens_for_user(user):
     }
 
 
-class UserRegisterationView(APIView):
+def kave_negar_token_send(receptor, code):
+    try:
+        api = KavenegarAPI(API_KEY)
+        params = {
+            'receptor': receptor,
+            'template': 'your_template',
+            'token': token
+        }
+        response = api.verify_lookup(params)
+    except APIException as e:
+        print(e)
+    except HTTPException as e:
+        print(e)
+
+
+# class UserRegisterationView(APIView):
+#     permission_classes = (permissions.AllowAny,)
+#     def post(self, request, format=None):
+#         token = randint(1000, 9999)
+#         kave_negar_token_send(request.data.get('phone'), token)
+#         serializer = UserRegisterationSerializer(data=request.data, context={'request': token})
+#         if serializer.is_valid(raise_exception=True):
+#             user = serializer.save()
+#             return Response({'msg':'Registration success...'}, status=status.HTTP_201_CREATED)
+        
+#         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
+class SendPhoneNumber(APIView):
     permission_classes = (permissions.AllowAny,)
     def post(self, request, format=None):
-        serializer = UserRegisterationSerializer(data=request.data)
+        serializer = PhoneSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            user = serializer.save()
-            token = get_tokens_for_user(user)
-            return Response({'token':token, 'msg':'Registration success...'}, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+            token = randint(1000, 9999)
+            valid = serializer.save()
+            valid.code = token
+            valid.save()
+            kave_negar_token_send(request.data.get('phone'), token)
+            return Response(valid.id, status=status.HTTP_201_CREATED)
+
+
+class Validate(APIView):
+    permission_classes = (permissions.AllowAny,)
+    def post(self, request, pk, format=None):
+        valid = Validation.objects.get(id=pk)
+        serializer = CodeSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            
+            print(valid.code)
+            if serializer.data.get('code') == valid.code:
+                return Response({'status':True, 'id': valid.id}, status=status.HTTP_200_OK)
+        return Response({'status':False}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserRegisterationView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    def post(self, request, status, pk, format=None):
+        if status == 'True':
+            serializer = UserRegisterationSerializer(data=request.data, context={'request': token})
+            if serializer.is_valid(raise_exception=True):
+                valid = Validation.objects.get(id=pk)
+                user = serializer.save()
+                user.phone = valid.phone
+                user.save()
+                return Response({'msg':'Registration success...'}, status=status.HTTP_201_CREATED)
+            
+            return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLoginView(APIView):

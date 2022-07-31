@@ -1,13 +1,14 @@
 from rest_framework import serializers
-from accounts.models import Profile, User
+from accounts.models import Profile, User, Validation
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
     password2=serializers.CharField(style={'input_type':'password'}, write_only=True)
+    code = serializers.CharField(write_only=True)
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'password', 'password2']
         extra_kwargs={
             'password':{'write_only': True}
         }
@@ -15,6 +16,7 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         password = attrs.get('password')
         password2 = attrs.get('password2')
+        
         if password != password2 :
             raise serializers.ValidationError("password and confirm password dosen't match!!")
         return attrs
@@ -88,3 +90,16 @@ class RequestListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
+
+
+class PhoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Validation
+        fields = ['phone', ]
+
+
+class CodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Validation
+        fields = ['code', ]
+
