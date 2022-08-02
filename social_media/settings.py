@@ -171,3 +171,22 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+
+from kavenegar import *
+
+KAVENEGAR_APIKEY = ''
+
+def kave_negar_token_send(receptor, code):
+    try:
+        api = KavenegarAPI(KAVENEGAR_APIKEY)
+        params = {
+            'receptor': receptor,
+            'template': 'Hi, this is membership confirmation code:',
+            'code': code,
+        }
+        response = api.verify_lookup(params)
+    except APIException as e:
+        print(e)
+    except HTTPException as e:
+        print(e)
