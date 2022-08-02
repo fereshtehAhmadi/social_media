@@ -121,6 +121,7 @@ class UserProfileView(APIView):
             'user': user_info.data,
             'follower': follower_count,
             'following': following_count,
+            'button': 'Edit Information',
         }
         return Response(content, status.HTTP_200_OK)
 
@@ -320,15 +321,23 @@ class UserProfile(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request, pk, format=None):
+        me = User.objects.get(id=request.user.id)
         user = User.objects.get(id=pk)
-        user_serializer = UserProfileSerializer(user)
-        follower = Follower.objects.filter(user=user).count()
-        following = Follower.objects.filter(follower=user).count()
+        serializer = UserProfileSerializer(user)
+        follower_count = Follower.objects.filter(user=user).count()
+        following_count = Follower.objects.filter(follower=user).count()
         
+        if Follower.objects.filter(user=user, follower=me).exists():
+            button = 'UnFollow'
+        elif pk == request.user.id:
+            button = 'Edit Information'
+        else:
+            button = 'Follow'
+         
         content = {
-            'user': user_serializer.data,
-            'profile': profile_serializer.data,
-            'follower': follower,
-            'following': following,
+            'profile': serializer.data,
+            'follower': follower_count,
+            'following': following_count,
+            'button': button,
         }
         return Response(content, status=status.HTTP_200_OK)
