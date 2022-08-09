@@ -13,6 +13,8 @@ urlpatterns = [
     path('user_logout/', views.UserLogoutView.as_view(), name='user_logout'),
     path('delete_account/', views.UserDeleteAccountView.as_view(), name='delete_account'),
     
+    path('search/<str:search>', views.SearchUser.as_view(), name='search'),
+    
     path('send_request/', views.SendRequest.as_view(), name='send_request'),
     path('request_list/', views.RequestListView.as_view(), name='request_list'),
     path('request_status/<int:pk>/<int:status>', views.AcceptRequest.as_view(), name='request_status'),

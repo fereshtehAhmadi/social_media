@@ -16,7 +16,8 @@ from accounts.models import User, Validation, Request, Follower
 from accounts.renders import UserRender
 from accounts.serializers import (UserRegisterationSerializer, CodeSerializer, PhoneSerializer,
     UserLoginSerializer, UserResetPasswordSerializer, UserChangePasswordSerializer,
-    UserProfileSerializer, UserSerializer, RequestSerializer, FollowerSerializer)
+    UserProfileSerializer, UserSerializer, SearchUserSerializer, RequestSerializer,
+    FollowerSerializer)
 
 
 def get_tokens_for_user(user):
@@ -164,6 +165,15 @@ class UserDeleteAccountView(APIView):
             user = User.objects.get(id=id)
             user.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SearchUser(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, search, format=None):
+        user = User.objects.filter(username__icontains=search)
+        serializer = SearchUserSerializer(user, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SendRequest(APIView):

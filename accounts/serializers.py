@@ -105,6 +105,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SearchUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'cover', ]
+
+
 class RequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
