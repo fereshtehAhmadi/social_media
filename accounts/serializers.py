@@ -115,25 +115,3 @@ class FollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follower
         fields = ['follower', ]
-
-
-# class UserChangePasswordSerializer(serializers.Serializer):
-#     password = serializers.CharField(max_length=255, 
-#                                      style = {'input_type': 'password'}, write_only=True)
-#     password2 = serializers.CharField(max_length=255, 
-#                                      style = {'input_type': 'password'}, write_only=True)
-#     class Meta:
-#         fields = ['password', 'password2']
-    
-#     def validate(self, attrs):
-#         password = attrs.get('password')
-#         password2 = attrs.get('password2')
-#         if password != password2:
-#             raise Serializer.VlidationError("password and confirm password doesn't match")
-#         return attrs
-
-
-# class RequestListSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Profile
-#         fields = '__all__'

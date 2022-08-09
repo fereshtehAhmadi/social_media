@@ -38,7 +38,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
     
     def __str__(self):
-        return self.user.username
+        return str(self.id)
 
 
 class LikeComment(models.Model):
@@ -57,7 +57,7 @@ class ReplyComment(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     
     def __str__(self):
-        return self.user.username
+        return str(self.id)
 
 
 class LikeReply(models.Model):
