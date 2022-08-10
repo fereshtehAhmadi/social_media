@@ -197,9 +197,14 @@ class RequestListView(APIView):
         user = User.objects.get(id=request.user.id)
         request_num = Request.objects.filter(user=user).count()        
         request_list = Request.objects.filter(user=user)
-        serializer = RequestSerializer(request_list, many=True)
+        # serializer = RequestSerializer(request_list, many=True)
+        requests = {}
+        for request in request_list:
+            user_dict = vars(request.request)
+            user = {user_dict["id"]: user_dict["username"]}
+            requests.update(user)
         content = {
-            'request_list': serializer.data,
+            'request_list': requests,
             'request_num': request_num,
         }
         return Response(content, status=status.HTTP_200_OK)
@@ -269,11 +274,16 @@ class MyFollowerList(APIView):
     def get(self, request, format=None):
         user = User.objects.get(id=request.user.id)
         follower_list = Follower.objects.filter(user=user)
-        serializer = FollowerSerializer(follower_list, many=True)
+        # serializer = FollowerSerializer(follower_list, many=True)
         num = Follower.objects.filter(user=user).count()
+        followers = {}
+        for follower in follower_list:
+            user_dict = vars(follower.follower)
+            user = {user_dict["id"]: user_dict["username"]}
+            followers.update(user)
         
         content = {
-            'follower': serializer.data,
+            'follower': followers,
             'number': num,
         }
         return Response(content, status=status.HTTP_200_OK)
@@ -285,11 +295,16 @@ class FollowerList(APIView):
     def get(self, request, pk=None, format=None):
         user = User.objects.get(id=pk)
         follower_list = Follower.objects.filter(user=user)
-        serializer = FollowerSerializer(follower_list, many=True)
+        # serializer = FollowerSerializer(follower_list, many=True)
         num = Follower.objects.filter(user=user).count()
+        followers = {}
+        for follower in follower_list:
+            user_dict = vars(follower.follower)
+            user = {user_dict["id"]: user_dict["username"]}
+            followers.update(user)
         
         content = {
-            'follower': serializer.data,
+            'follower': followers,
             'number': num,
         }
         return Response(content, status=status.HTTP_200_OK)
@@ -301,11 +316,17 @@ class MyFollowingList(APIView):
     def get(self, request, format=None):
         user = User.objects.get(id=request.user.id)
         following_list = Follower.objects.filter(follower=user)
-        serializer = FollowerSerializer(following_list, many=True)
+        # serializer = FollowerSerializer(following_list, many=True)
         num = Follower.objects.filter(follower=user).count()
         
+        followings = {}
+        for following in following_list:
+            user_dict = vars(following.user)
+            user = {user_dict["id"]: user_dict["username"]}
+            followings.update(user)
+            
         content = {
-            'following': serializer.data,
+            'following': followings,
             'number': num,
         }
         return Response(content, status=status.HTTP_200_OK)
@@ -317,11 +338,16 @@ class FollowingList(APIView):
     def get(self, request, pk=None, format=None):
         user = User.objects.get(id=pk)
         following_list = Follower.objects.filter(follower=user)
-        serializer = FollowerSerializer(following_list, many=True)
+        # serializer = FollowerSerializer(following_list, many=True)
         num = Follower.objects.filter(follower=user).count()
+        followings = {}
+        for following in following_list:
+            user_dict = vars(following.user)
+            user = {user_dict["id"]: user_dict["username"]}
+            followings.update(user)
         
         content = {
-            'following': serializer.data,
+            'following': followings,
             'number': num,
         }
         return Response(content, status=status.HTTP_200_OK)

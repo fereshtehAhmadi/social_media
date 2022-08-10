@@ -86,7 +86,7 @@ class Request(models.Model):
         return {"id": user_dict["id"], "username": user_dict["username"]}
 
     def get_requester_info(self):
-        user_dict = vars(self.follower)
+        user_dict = vars(self.request)
         return {"id": user_dict["id"], "username": user_dict["username"]}
 
     def get_requests(self, user):
