@@ -196,19 +196,50 @@ class LikeCommentView(APIView):
         return Response({'msg': msg}, status=status.HTTP_201_CREATED)
 
 
+# class ShowComment(APIView):
+#     authentication_classes = [SessionAuthentication, BasicAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     def get(self, request, pk, format=None):
+#         post_obj = get_object_or_404(Posts, pk=pk)
+#         post_comments = post_obj.comment_set.all()
+#         # comment = Comment.objects.filter(post__id=pk)
+#         serializer = CommentSerializer(post_comments, many=True)
+#         comment_obj = {'comment': comment for comment in post_comments}
+#         like = LikeComment.objects.filter(**comment_obj).count()
+#         content = {
+#             'comment': serializer.data,
+#             'like': like,
+#         }
+#         return Response(content, status=status.HTTP_200_OK)
+
+
 class ShowComment(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request, pk, format=None):
-        post_obj = get_object_or_404(Posts, pk=pk)
-        post_comments = post_obj.comment_set.all()
-        # comment = Comment.objects.filter(post__id=pk)
-        serializer = CommentSerializer(post_comments, many=True)
-        comment_obj = {'comment': comment for comment in post_comments}
-        like = LikeComment.objects.filter(**comment_obj).count()
+        comment_list = Comment.objects.filter(post__id=pk)
+        comments = {}
+        for comment in comment_list:
+            like_comment = LikeComment.objects.filter(comment=comment).count()
+            user_dict = vars(comment.user)
+            replys = {}
+            reply_list = ReplyComment.objects.filter(comment=comment)
+            
+            for reply in reply_list:
+                like_reply = LikeReply.objects.filter(reply=reply).count()
+                reply_id = reply.id
+                user2_dict = vars(reply.user)
+                rep = {reply.id:reply.content, f'time{reply_id}':comment.create, f'user_id{reply_id}':user2_dict["id"], f'user_username{reply_id}':user2_dict["username"], f'like{reply_id}':like_reply}
+                replys.update(rep)
+                print(replys)
+                
+            comment_id= comment.id   
+            comment_obj = {comment_id:comment.content, f'time{comment_id}':comment.create, f'user_id{comment_id}':user_dict["id"], f'user_username{comment_id}':user_dict["username"], f'like{comment_id}':like_comment, f'replys{comment_id}':replys}
+            reply_list = ReplyComment.objects.filter(comment=comment)
+            comments.update(comment_obj)
+                
         content = {
-            'comment': serializer.data,
-            'like': like,
+            'comment': comments,
         }
         return Response(content, status=status.HTTP_200_OK)
 
@@ -289,20 +320,20 @@ class ShowLikeReplyList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ShowReplyComment(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
-    def get(self, request, pk, format=None):
-        reply = ReplyComment.objects.filter(comment__id=pk)
-        serializer = ReplyCommentSerializer(reply, many=True)
-        reply_obj = {'reply': rep for rep in reply}
-        like = LikeReply.objects.filter(**reply_obj).count()
+# class ShowReplyComment(APIView):
+#     authentication_classes = [SessionAuthentication, BasicAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     def get(self, request, pk, format=None):
+#         reply = ReplyComment.objects.filter(comment__id=pk)
+#         serializer = ReplyCommentSerializer(reply, many=True)
+#         reply_obj = {'reply': rep for rep in reply}
+#         like = LikeReply.objects.filter(**reply_obj).count()
         
-        content = {
-            'reply': serializer.data,
-            'like': like,
-        }
-        return Response(content, status=status.HTTP_200_OK)
+#         content = {
+#             'reply': serializer.data,
+#             'like': like,
+#         }
+#         return Response(content, status=status.HTTP_200_OK)
 
 
 class BookMarckView(APIView):

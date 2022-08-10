@@ -225,7 +225,7 @@ class AcceptRequest(APIView):
         elif status == 0:
             request.delete()
             return Response({'msg': 'you delete the request...'})
-        return Response({'msg': 'ey baba!!'})
+        return Response({'msg': ':)'})
 
 
 class UnFollowUserView(APIView):
