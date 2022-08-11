@@ -22,7 +22,6 @@ urlpatterns = [
     path('delete_reply_comment/<int:pk>', views.DeleteReplyComment.as_view(), name='delete_reply_comment'),
     
     path('show_comments/<int:pk>', views.ShowComment.as_view(), name='show_comments'),
-    path('show_reply/<int:pk>', views.ShowReplyComment.as_view(), name='show_reply'),
     
     path('bookmarck/<int:pk>', views.BookMarckView.as_view(), name='bookmarck'),
     path('show_bookmarck/', views.AllBookMarckView.as_view(), name='show_bookmarck'),

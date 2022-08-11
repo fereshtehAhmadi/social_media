@@ -15,8 +15,7 @@ from posts.models import (Posts, Gallery, LikePost, Comment, LikeComment,
 from accounts.renders import UserRender
 from posts.serializers import (PostsSerializer, GallerySerializer, CreatePostSerializer,
                                CreateCommentSerializer, ReplyCommentSerializer, BookMarckSerializer,
-                               CommentSerializer, CreateReplyCommentSerializer, UpdatePostSerializer,
-                               LikePostSerializer, LikeCommentSerializer, LikeReplySerializer)
+                               CommentSerializer, CreateReplyCommentSerializer, UpdatePostSerializer,)
 
 
 class ShowUserPost(APIView):
@@ -165,9 +164,13 @@ class ShowLikePostList(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, pk, format=None):
         post = Posts.objects.get(id=pk)
-        like = LikePost.objects.filter(post=post)
-        serializer = LikePostSerializer(like, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        like_list = LikePost.objects.filter(post=post)
+        liker = {}
+        for like in like_list:
+            user_dict = vars(like.user)
+            user = {user_dict["id"]: user_dict["username"]}
+            liker.update(user)
+        return Response({'liker_list': liker}, status=status.HTTP_200_OK)
 
 
 class CreateCommentView(APIView):
@@ -262,9 +265,13 @@ class ShowLikeCommentList(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, pk, format=None):
         comment = Comment.objects.get(id=pk)
-        like = LikeComment.objects.filter(comment=comment)
-        serializer = LikeCommentSerializer(like, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        like_list = LikeComment.objects.filter(comment=comment)
+        liker = {}
+        for like in like_list:
+            user_dict = vars(like.user)
+            user = {user_dict["id"]: user_dict["username"]}
+            liker.update(user)
+        return Response({'liker_list': liker}, status=status.HTTP_200_OK)
 
 
 class ReplyCommentView(APIView):
@@ -315,9 +322,13 @@ class ShowLikeReplyList(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, pk, format=None):
         comment = ReplyComment.objects.get(id=pk)
-        like = LikeReply.objects.get(reply=comment)
-        serializer = LikeReplySerializer(like, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        like_list = LikeReply.objects.get(reply=comment)
+        liker = {}
+        for like in like_list:
+            user_dict = vars(like.user)
+            user = {user_dict["id"]: user_dict["username"]}
+            liker.update(user)
+        return Response({'liker_list':liker}, status=status.HTTP_200_OK)
 
 
 # class ShowReplyComment(APIView):
@@ -364,6 +375,7 @@ class BookMarckView(APIView):
                     return Response({'msg': 'add in bookmarck...'}, status=status.HTTP_201_CREATED)
         else:
             return Response({'msg': 'you can`t bookmarck this post!!!'})
+
 
 class AllBookMarckView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
