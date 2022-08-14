@@ -15,7 +15,8 @@ from posts.models import (Posts, Gallery, LikePost, Comment, LikeComment,
 from accounts.renders import UserRender
 from posts.serializers import (PostsSerializer, GallerySerializer, CreatePostSerializer,
                                CreateCommentSerializer, ReplyCommentSerializer, BookMarckSerializer,
-                               CommentSerializer, CreateReplyCommentSerializer, UpdatePostSerializer,)
+                               LikePostSerializer, CommentSerializer, CreateReplyCommentSerializer,
+                               UpdatePostSerializer,)
 
 
 class ShowUserPost(APIView):
@@ -197,23 +198,6 @@ class LikeCommentView(APIView):
             like = LikeComment.objects.create(user__id=request.user.id, comment__id=pk, like=True)
             msg = 'liked...'
         return Response({'msg': msg}, status=status.HTTP_201_CREATED)
-
-
-# class ShowComment(APIView):
-#     authentication_classes = [SessionAuthentication, BasicAuthentication]
-#     permission_classes = [IsAuthenticated]
-#     def get(self, request, pk, format=None):
-#         post_obj = get_object_or_404(Posts, pk=pk)
-#         post_comments = post_obj.comment_set.all()
-#         # comment = Comment.objects.filter(post__id=pk)
-#         serializer = CommentSerializer(post_comments, many=True)
-#         comment_obj = {'comment': comment for comment in post_comments}
-#         like = LikeComment.objects.filter(**comment_obj).count()
-#         content = {
-#             'comment': serializer.data,
-#             'like': like,
-#         }
-#         return Response(content, status=status.HTTP_200_OK)
 
 
 class ShowComment(APIView):

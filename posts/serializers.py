@@ -70,3 +70,24 @@ class BookMarckSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookMarck
         fields = '__all__'
+
+
+class LikePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LikePost
+        fields = ['user']
+        depth = 1
+
+
+class LikeCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LikeComment
+        fields = '__all__'
+        depth = 1
+
+
+class LikeReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LikeReply
+        fields = '__all__'
+        depth = 1

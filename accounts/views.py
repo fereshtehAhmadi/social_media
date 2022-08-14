@@ -9,6 +9,8 @@ from random import randint
 from kavenegar import *
 from social_media.settings import kave_negar_token_send
 
+from api_list import api_list
+
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.db.models import Count
 
@@ -18,6 +20,13 @@ from accounts.serializers import (UserRegisterationSerializer, CodeSerializer, P
     UserLoginSerializer, UserResetPasswordSerializer, UserChangePasswordSerializer,
     UserProfileSerializer, UserSerializer, SearchUserSerializer, RequestSerializer,
     FollowerSerializer)
+
+
+
+class ApiListView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    def get(self, request, format=None):         
+        return Response(api_list)
 
 
 def get_tokens_for_user(user):

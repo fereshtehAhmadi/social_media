@@ -18,15 +18,15 @@ api_list = {
     'accounts/unfollow/<int:pk>': 'The user unfollow other user.',
     'accounts/block/<int:pk>': 'The user block other user.',
     'accounts/user_info/<int:pk>': 'The user sees other user informations.',
-    
+        
     'posts/posts': 'Show the user posts.',
     'posts/posts/<int:pk>': 'Show the other user posts.',
     'posts/single_post/<int:pk>': 'Show a single post.',
     'posts/new_post/': 'Add a new post.',
     'posts/update_post/<int:pk>': 'Update a post.',
     'posts/delete_post/<int:pk>': 'Delete a post.',
-    
-    'posts/comment/<int:pk>': 'Add a comment and get post id.',
+        
+    'posts/create_comment/<int:pk>': 'Add a comment and get post id.',
     'posts/delete_comment/<int:pk>': 'delete a comment and get comment id.',
     'posts/reply_comment/<int:pk>': 'Reply a comment and get comment id.',
     'posts/delete_reply_comment/<int:pk>': 'Delete a Reply and get reply comment id.',
@@ -37,8 +37,8 @@ api_list = {
     'posts/show_liker_comment/<int:pk>': 'Show who like this comment and get comment id.',
     'posts/like_reply/<int:pk>': 'Like reply comment.',
     'posts/show_liker_reply/<int:pk>': 'Show who like a reply comment and get reply comment id.',
+    
     'posts/show_comments/<int:pk>': 'Show all comments and get post id.',
-    'posts/show_reply/<int:pk>': 'Show all reply comments and get comment id.',
     
     'posts/bookmarck/<int:pk>': 'Add or delete post from bookmarck and get post id.',
     'posts/show_bookmarck/': 'Show bookmarck list .',
