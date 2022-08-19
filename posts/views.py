@@ -16,7 +16,7 @@ from accounts.renders import UserRender
 from posts.serializers import (PostsSerializer, GallerySerializer, CreatePostSerializer,
                                CreateCommentSerializer, ReplyCommentSerializer, BookMarckSerializer,
                                LikePostSerializer, CommentSerializer, CreateReplyCommentSerializer,
-                               UpdatePostSerializer,)
+                               UpdatePostSerializer, UserNameSerializer)
 
 
 class ShowUserPost(APIView):
@@ -171,7 +171,7 @@ class ShowLikePostList(APIView):
             user_dict = vars(like.user)
             user = {user_dict["id"]: user_dict["username"]}
             liker.update(user)
-        return Response({'liker_list': liker}, status=status.HTTP_200_OK)
+        return Response({'liker': liker}, status=status.HTTP_200_OK)
 
 
 class CreateCommentView(APIView):

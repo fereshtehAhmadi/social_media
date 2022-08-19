@@ -3,7 +3,7 @@ from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, User
 )
 from django.core.validators import RegexValidator
-# from django.contrib.auth.models import User
+
 
 class UserManager(BaseUserManager):
     def create_user(self, username, first_name, last_name, phone, password=None, password2=None):

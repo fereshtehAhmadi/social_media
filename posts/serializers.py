@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from accounts.models import User
 from posts.models import (Posts, Gallery, LikePost, Comment, LikeComment,
                           ReplyComment, LikeReply, BookMarck)
 
@@ -72,7 +73,13 @@ class BookMarckSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UserNameSerializer(serializers.ModelSerializer):
+    model = User
+    fields = ['id', 'username']
+
+
 class LikePostSerializer(serializers.ModelSerializer):
+    user = UserNameSerializer()
     class Meta:
         model = LikePost
         fields = ['user']
